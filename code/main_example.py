@@ -10,23 +10,23 @@ import pandas as pd
 # Load the images you want to analyze
 
 filenames = [
-    r"../images/MASK_SK658 Llobe ch010039.jpg",
-    r"../images/MASK_SK658 Slobe ch010066.jpg",
-    r"../images/MASK_SK658 Slobe ch010147.jpg",
-    r"../images/MASK_SK658 Slobe ch010110.jpg",
-    r"../images/MASK_SK658 Slobe ch010130.jpg",
-    r"../images/MASK_SK658 Slobe ch010114.jpg",
+    r"../images/MASK_Sk658 Llobe ch010017.jp",
+    r"../images/MASK_SK658 Llobe ch010018.jpg",
+    r"../images/MASK_SK658 Llobe ch010019.jpg",
+    r"../images/MASK_SK658 Llobe ch010021.jpg",
+    r"../images/MASK_SK658 Llobe ch010022.jpg",
+    r"../images/MASK_SK658 Llobe ch010023.jpg",
 ]
 
 # Enter the depth of each image (in the same order that the images are listed above; you can find these in the .csv file provided to you which is tilted: "Filenames and Depths for Students")
 
 depths = [
-    15,
-    1000,
-    3000,
-    5300,
-    7000,
-    9900
+    45,
+    90,
+    60,
+    30,
+    80,
+    100
 ]
 
 # Make the lists that will be used
@@ -39,7 +39,7 @@ white_percents = []
 # Build the list of all the images you are analyzing
 
 for filename in filenames:
-    img = cv2.imread(filename, 0)
+    img = cv2.imread('images', 0)
     images.append(img)
 
 # For each image (until the end of the list of images), calculate the number of black and white pixels and make a list that contains this information for each filename.

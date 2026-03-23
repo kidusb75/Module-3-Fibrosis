@@ -2,7 +2,6 @@ import cv2
 import numpy as np
 import pandas as pd
 from termcolor import colored
-import os
 
 # 1. Setup Data
 filenames = [
@@ -45,7 +44,7 @@ for i in range(len(filenames)):
 
     # Store results
     results.append({
-        'Filename': os.path.basename(filename),
+        'Filename': filename.split("/")[-1],
         'Depth': depth,
         'White_Pixels': white_count,
         'Black_Pixels': black_count,
@@ -53,7 +52,7 @@ for i in range(len(filenames)):
     })
 
     # REQUIRED PRINT FORMAT
-    print(colored(os.path.basename(filename), "red"))
+    print(colored(filename.split("/")[-1], "red"))
     print(f"White pixels: {white_count}")
     print(f"Black pixels: {black_count}")
     print(f"Percent white pixels: {white_percent:.2f}%")

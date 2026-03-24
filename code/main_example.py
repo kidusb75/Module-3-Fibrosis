@@ -9,18 +9,29 @@ import pandas as pd             # used to create csv file
 
 # Load the images you want to analyze
 
-filenames = [
-    r"images/MASK_Sk658 Llobe ch010017.jpg",
-    r"images/MASK_SK658 Llobe ch010018.jpg",
-    r"images/MASK_SK658 Llobe ch010019.jpg",
-    r"images/MASK_SK658 Llobe ch010021.jpg",
-    r"images/MASK_SK658 Llobe ch010022.jpg",
-    r"images/MASK_SK658 Llobe ch010023.jpg",
+filenames = [                                                                                                               # Variation in depth for better results (micrometers)
+    r"C:\Users\kidus\OneDrive\Desktop\Computational BME\Module 03\Module-3-Fibrosis\images\MASK_Sk658 Llobe ch010039.jpg",  # 15
+    r"C:\Users\kidus\OneDrive\Desktop\Computational BME\Module 03\Module-3-Fibrosis\images\MASK_Sk658 Llobe ch010032.jpg",  # 500
+    r"C:\Users\kidus\OneDrive\Desktop\Computational BME\Module 03\Module-3-Fibrosis\images\MASK_Sk658 Llobe ch010146.jpg",  # 2000
+    r"C:\Users\kidus\OneDrive\Desktop\Computational BME\Module 03\Module-3-Fibrosis\images\MASK_SK658 Slobe ch010112.jpg",  # 5500 
+    r"C:\Users\kidus\OneDrive\Desktop\Computational BME\Module 03\Module-3-Fibrosis\images\MASK_SK658 Slobe ch010119.jpg",  # 8000
+    r"C:\Users\kidus\OneDrive\Desktop\Computational BME\Module 03\Module-3-Fibrosis\images\MASK_SK658 Slobe ch010092.jpg",  # 10000
 ]
+
+# For partner: use relative paths so it works for them. 
+# Use relative paths so it works for your partner too!
+#filenames = [
+    #r"images/MASK_SK658 Llobe ch010039.jpg",
+    #r"images/MASK_SK658 Llobe ch010032.jpg",
+    #r"images/MASK_SK658 Slobe ch010146.jpg",
+    #r"images/MASK_SK658 Slobe ch010112.jpg",
+    #r"images/MASK_SK658 Slobe ch010119.jpg",
+    #r"images/MASK_SK658 Slobe ch010092.jpg"
+#]
 
 # Enter the depth of each image (in the same order that the images are listed above; you can find these in the .csv file provided to you which is tilted: "Filenames and Depths for Students")
 
-depths = [45, 90, 60, 30, 80, 100]
+depths = [15, 500, 2000, 5500, 8000, 10000]
 results = []
 white_percent_list = []
 
@@ -73,7 +84,6 @@ print("The .csv file 'Percent_White_Pixels.csv' has been created.")
 
 ##############
 # LECTURE 2: UNCOMMENT BELOW
-
 # # Interpolate a point: given a depth, find the corresponding white pixel percentage
 
 # interpolate_depth = float(input(colored(

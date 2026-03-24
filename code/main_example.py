@@ -1,21 +1,21 @@
 '''Module 3: count black and white pixels and compute the percentage of white pixels in a .jpg image and extrapolate points'''
 
-from termcolor import colored
-import cv2 
-import numpy as np
-import matplotlib.pyplot as plt
-from scipy.interpolate import interp1d
-import pandas as pd
+from termcolor import colored   # used only to print colored text in terminal
+import cv2                      # OpenCV library for image processing
+import numpy as np              # numerical operations (arrays, sums, etc.)
+import matplotlib.pyplot as plt # not used in this part, but imported
+from scipy.interpolate import interp1d  # not used in this part
+import pandas as pd             # used to create csv file
 
 # Load the images you want to analyze
 
 filenames = [
-    r"../images/MASK_SK658 Llobe ch010018.jpg",  # edited from class -- these are the 6 images that we will be analyzing in this module; 
-    r"../images/MASK_SK658 Slobe ch010019.jpg",
-    r"../images/MASK_SK658 Slobe ch010021.jpg",
-    r"../images/MASK_SK658 Slobe ch010022.jpg",
-    r"../images/MASK_SK658 Slobe ch010025.jpg",
-    r"../images/MASK_SK658 Slobe ch010121.jpg",
+    r"C:\Users\kidus\OneDrive\Desktop\Computational BME\Module 02\Module-3-Fibrosis\images\MASK_Sk658 Llobe ch010017.jpg",  # edited from class -- these are the 6 images that we will be analyzing in this module; 
+    r"images\MASK_Sk658 Llobe ch010019.jpg",
+    r"C:\Users\kidus\OneDrive\Desktop\Computational BME\Module 02\Module-3-Fibrosis\images\MASK_Sk658 Llobe ch010021.jpg",
+    r"images\MASK_SK658 Slobe ch010022.jpg",
+    r"images\MASK_SK658 Slobe ch010025.jpg",
+    r"images\MASK_SK658 Slobe ch010121.jpg",
 ]
 
 # Enter the depth of each image (in the same order that the images are listed above; you can find these in the .csv file provided to you which is tilted: "Filenames and Depths for Students")
@@ -29,7 +29,7 @@ depths = [
     9900
 ]
 
-# Make the lists that will be used
+# Make the lists that will be used -- here, results are stored. 
 
 images = []
 white_counts = []

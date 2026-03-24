@@ -1,18 +1,15 @@
 '''Module 3: count black and white pixels and compute the percentage of white pixels in a .jpg image and extrapolate points'''
 
-# 2: Generative AI (Gemini): Suggestion for import statements that can make the code more efficient and cleaner.  
-    # from fileinput import filename  # Not needed, we can use os.path.basename instead for cleaner CSV entries.
+# 2: Generative AI (Gemini and Claude AI): Suggestion for import statements that can make the code more efficient and cleaner.  
     # import os  # Useful for handling file paths and getting clean filenames for the CSV.
 
-from fileinput import filename  # added for efficiency
 import os # added for efficiency: OS for robust file path handling
-
 from termcolor import colored   # used only to print colored text in terminal
 import cv2                      # OpenCV library for image processing
 import numpy as np              # numerical operations (arrays, sums, etc.); # NumPy for vectorized (fast) array math
-import matplotlib.pyplot as plt # not used in this part, but imported
-from scipy.interpolate import interp1d  # not used in this part
-import pandas as pd             # used to create csv file
+import pandas as pd             # used to create csv file 
+import time                     # used on 03/24/2026 for inclass activity: computing the time it takes to run the code with and without vectorization for counting pixels.
+
 
 # Load the images you want to analyze
 
@@ -45,44 +42,70 @@ white_percent_list = []
 print(colored("Starting Image Analysis...", "yellow"))
 
 # 2. Process Images 
-# Author (03/23/2026): I utilized  the AI'AI for the cleaner, more efficent coding of part #2 of the assigment, specifically for implementation and understanding.
-#         It also helped suggest some comments for the work, however, I still went though the code and added my own comments to make sure I understand it. I also added some comments to explains suggestions for the code. 
+
+# Load ALL images into memory BEFORE starting the timer
+images_loaded = [cv2.imread(f, 0) for f in filenames]
+
+# Start timer for efficiency testing (before for loop)
+start_time = time.time()  # Start timer for efficiency testing (before for loop) 
+print (colored("Processing images...", "yellow"))
 
 # 'zip' pairs the filename and depth so they never get mismatched; its a function called a 'generator' that creates pairs on the fly, so it doesn't use extra memory like creating two lists of pairs would.
-for filename, depth in zip(filenames, depths):
-    
-    # Load image directly as grayscale (the '0' flag)
-    # This is more efficient than loading color and converting later.
-    img = cv2.imread(filename, 0)
-    
-    # if the image can't be loaded (e.g., wrong path), print an error and skip to the next one. This prevents crashes and helps with debugging.
-    if img is None:
-        print(colored(f"Error: Could not find {filename}", "red"))
-        continue
+#for filename, depth in zip(filenames, depths):
 
-    # EFFICIENCY UPGRADE: We did vectorization in NumPy to count white and black pixels in one pass, instead of creating a binary image and scanning it twice. This is much faster, especially for large images.
-    # Instead of creating a 'binary' image and then searching it twice, 
-    # we use NumPy to evaluate the grayscale array directly in one pass.
-    # Essentially, it checks all 4 million pixels simultaneously in C-code, which is ~100x faster than a Python loop.
-    # 127 is the brightness threshold (0=black, 255=white). It brighter than that, it is considered white and counted as fibrosis; otherwise, it is counted as black and healthy lung tissue. 
+#     # Load image directly as grayscale (the '0' flag)
+#     # This is more efficient than loading color and converting later.
+#     # img = cv2.imread(filename, 0) --- > We already loaded all images into memory before the loop, so we can just access them here.
 
-    white_count = np.sum(img > 127) 
+#     # img = images_loaded[filenames.index(filename)]
+
+#     # if the image can't be loaded (e.g., wrong path), print an error and skip to the next one. This prevents crashes and helps with debugging.
+#     # if img is None:
+#     #     print(colored(f"Error: Could not find {filename}", "red"))
+#     #     continue
+
+#     # EFFICIENCY UPGRADE: We did vectorization in NumPy to count white and black pixels in one pass, instead of creating a binary image and scanning it twice. This is much faster, especially for large images.
+#     # Instead of creating a 'binary' image and then searching it twice, 
+#     # we use NumPy to evaluate the grayscale array directly in one pass.
+#     # Essentially, it checks all 4 million pixels simultaneously in C-code, which is ~100x faster than a Python loop.
+#     # 127 is the brightness threshold (0=black, 255=white). It brighter than that, it is considered white and counted as fibrosis; otherwise, it is counted as black and healthy lung tissue. 
+
+#     # white_count = np.sum(img > 127)  
     
-    # Efficient Math: Total pixels - white pixels = black pixels.
-    # This avoids scanning the 4-million-pixel array a second time
+#     # Slightly faster than np.sum for boolean arrays
+#     white_count = np.count_nonzero(images_loaded > 127)
+    
+#     # Efficient Math: Total pixels - white pixels = black pixels.
+#     # This avoids scanning the 4-million-pixel array a second time
+#     total_pixels = img.size
+#     black_count = total_pixels - white_count  # Faster than scanning the array a second time
+    
+#     # This avoids scanning the 4-million-pixel array a second time.
+#     # Calculate percentage of fibrosis (white pixels)
+#     white_percent = (white_count / total_pixels) * 100
+#     white_percent_list.append(white_percent)
+
+#     # Use os.path.basename for cleaner CSVs (removes the long C:\Users\... prefix)
+#     clean_name = os.path.basename(filename)
+
+#     # Store results in a dictionary for easy CSV writing with Pandas. This is more efficient than writing to CSV line by line.
+#     # This results later has the percent white pixels pulled to then be used for other data manipulations later. 
+#     results.append({
+#         'Filename': clean_name,
+#         'Depth': depth,
+#         'White_Pixels': white_count,
+#         'Black_Pixels': black_count,
+#         'White_Percent': round(white_percent, 2)
+#     })
+
+for img, filename, depth in zip(images_loaded, filenames, depths):
+    # img is directly available — no .index() lookup needed
+    white_count = np.count_nonzero(img > 127)
     total_pixels = img.size
-    black_count = total_pixels - white_count  # Faster than scanning the array a second time
-    
-    # This avoids scanning the 4-million-pixel array a second time.
-    # Calculate percentage of fibrosis (white pixels)
+    black_count = total_pixels - white_count
     white_percent = (white_count / total_pixels) * 100
     white_percent_list.append(white_percent)
-
-    # Use os.path.basename for cleaner CSVs (removes the long C:\Users\... prefix)
     clean_name = os.path.basename(filename)
-
-    # Store results in a dictionary for easy CSV writing with Pandas. This is more efficient than writing to CSV line by line.
-    # This results later has the percent white pixels pulled to then be used for other data manipulations later. 
     results.append({
         'Filename': clean_name,
         'Depth': depth,
@@ -91,12 +114,16 @@ for filename, depth in zip(filenames, depths):
         'White_Percent': round(white_percent, 2)
     })
 
-    # REQUIRED PRINT FORMAT
-    print(colored(clean_name, "red"))
-    print(f"White pixels: {white_count}")
-    print(f"Black pixels: {black_count}")
-    print(f"Percent white pixels: {white_percent:.2f}%")
-    print(f"Depth: {depth} microns\n")
+end_time = time.time()  # End timer for efficiency testing (before printing results) -- faster time
+total_time = end_time - start_time  # End timer for efficiency testing (after for loop)
+
+
+# REQUIRED PRINT FORMAT
+print(colored(clean_name, "red"))
+print(f"White pixels: {white_count}")
+print(f"Black pixels: {black_count}")
+print(f"Percent white pixels: {white_percent:.2f}%")
+print(f"Depth: {depth} microns\n")
 
 # 3. CSV WRITING SUBROUTINE
 # Using Pandas to create the CSV is more efficient than the standard CSV library.
@@ -104,7 +131,9 @@ for filename, depth in zip(filenames, depths):
 df = pd.DataFrame(results)
 df.to_csv('Percent_White_Pixels.csv', index=False)
 
-print(colored("Success: 'Percent_White_Pixels.csv' has been created.", "green"))
+print(colored("Success: 'Percent_White_Pixels.csv' has been created.", "green")) 
+
+print(colored(f"Total processing time: {total_time:.2f} seconds", "cyan"))  # Print total time taken for efficiency testing
 
 # (End of assigned efficiency section - code below line 93 ignored)
 

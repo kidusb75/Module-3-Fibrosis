@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 Filenames,Depths,White percents
 images\MASK_Sk658 Llobe ch010017.jpg,15,0.6571054458618164
 images\MASK_SK658 Slobe ch010019.jpg,1000,
@@ -5,3 +6,12 @@ images\MASK_SK658 Slobe ch010021.jpg,3000,
 images\MASK_SK658 Slobe ch010022.jpg,5300,
 images\MASK_SK658 Slobe ch010025.jpg,7000,
 images\MASK_SK658 Slobe ch010121.jpg,9900,
+=======
+Filename,Depth,White_Pixels,Black_Pixels,White_Percent
+images/MASK_Sk658 Llobe ch010017.jpg,45,27561,4166743,0.66
+images/MASK_SK658 Llobe ch010018.jpg,90,33746,4160558,0.8
+images/MASK_SK658 Llobe ch010019.jpg,60,31331,4162973,0.75
+images/MASK_SK658 Llobe ch010021.jpg,30,23900,4170404,0.57
+images/MASK_SK658 Llobe ch010022.jpg,80,33151,4161153,0.79
+images/MASK_SK658 Llobe ch010023.jpg,100,37508,4156796,0.89
+>>>>>>> 8224b5ea3c85727729f5de32ebf9126461eb5df1

@@ -2,6 +2,8 @@
 
 # 2: Generative AI (Gemini and Claude AI): Suggestion for import statements that can make the code more efficient and cleaner.  
     # import os  # Useful for handling file paths and getting clean filenames for the CSV.
+    # Furthermore, elements of the code such as understanding certian functions and diagnosing errors were instances where AI was utilized to help the team understand the code better, especially in cases where the generative model put out a more efficient way to do something (like using np.count_nonzero instead of nested for loops to count pixels, which is much faster); 
+    # Lastly, occasionally needed AI to understand why and help comment some specific code lines for better clarity and understanding, but all final implementation and understanding was done by the team. 
 
 import os # added for efficiency: OS for robust file path handling
 from termcolor import colored   # used only to print colored text in terminal
@@ -11,8 +13,9 @@ import pandas as pd             # used to create csv file
 import time                     # used on 03/24/2026 for inclass activity: computing the time it takes to run the code with and without vectorization for counting pixels.
 
 
-# Load the images you want to analyze
-
+# Load the images you want to analyze -- specific file paths depend from computer or access method: 
+# the primary images that we ended up analyzing are sourced from the images foleder in the Module-3-Fibrosis folder, but you can also use the full file paths to load the images if you want.
+    # The 78 image are provided by the instructor. 
 filenames = [                                                                                                               # Variation in depth for better results (micrometers)
     r"C:\Users\kidus\OneDrive\Desktop\Computational BME\Module 03\Module-3-Fibrosis\images\MASK_Sk658 Llobe ch010039.jpg",  # 15
     r"C:\Users\kidus\OneDrive\Desktop\Computational BME\Module 03\Module-3-Fibrosis\images\MASK_Sk658 Llobe ch010032.jpg",  # 500
@@ -34,7 +37,9 @@ filenames = [                                                                   
 # ]
 
 # Enter the depth of each image (in the same order that the images are listed above; you can find these in the .csv file provided to you which is tilted: "Filenames and Depths for Students")
-
+# The depth values are in microns, and they represent the depth at which each image was taken. This information is crucial for analyzing the relationship between depth and the percentage of white pixels in the images, which can be important for understanding tissue characteristics in a biomedical context.
+# More specifically, these are the depth values chronologically listed immages above, from shallowest to deepest within the mice lungs; and the team did this collection method instead of choosing images at complete random becasue we wanted to have a range of depths represented in our data, which can help us see trends and patterns in the percentage of white pixels as depth increases. 
+# By including images from various depths, we can better understand how the tissue characteristics change with depth, which is important for our analysis of fibrosis in the lungs.
 depths = [15, 500, 2000, 5500, 8000, 10000]
 results = []
 white_percent_list = []
@@ -46,66 +51,21 @@ print(colored("Starting Image Analysis...", "yellow"))
 # Load ALL images into memory BEFORE starting the timer
 images_loaded = [cv2.imread(f, 0) for f in filenames]
 
-# Start timer for efficiency testing (before for loop)
+# Start timer for efficiency testing (before for loop) 
 start_time = time.time()  # Start timer for efficiency testing (before for loop) 
 print (colored("Processing images...", "yellow"))
 
-# 'zip' pairs the filename and depth so they never get mismatched; its a function called a 'generator' that creates pairs on the fly, so it doesn't use extra memory like creating two lists of pairs would.
-#for filename, depth in zip(filenames, depths):
-
-#     # Load image directly as grayscale (the '0' flag)
-#     # This is more efficient than loading color and converting later.
-#     # img = cv2.imread(filename, 0) --- > We already loaded all images into memory before the loop, so we can just access them here.
-
-#     # img = images_loaded[filenames.index(filename)]
-
-#     # if the image can't be loaded (e.g., wrong path), print an error and skip to the next one. This prevents crashes and helps with debugging.
-#     # if img is None:
-#     #     print(colored(f"Error: Could not find {filename}", "red"))
-#     #     continue
-
-#     # EFFICIENCY UPGRADE: We did vectorization in NumPy to count white and black pixels in one pass, instead of creating a binary image and scanning it twice. This is much faster, especially for large images.
-#     # Instead of creating a 'binary' image and then searching it twice, 
-#     # we use NumPy to evaluate the grayscale array directly in one pass.
-#     # Essentially, it checks all 4 million pixels simultaneously in C-code, which is ~100x faster than a Python loop.
-#     # 127 is the brightness threshold (0=black, 255=white). It brighter than that, it is considered white and counted as fibrosis; otherwise, it is counted as black and healthy lung tissue. 
-
-#     # white_count = np.sum(img > 127)  
-    
-#     # Slightly faster than np.sum for boolean arrays
-#     white_count = np.count_nonzero(images_loaded > 127)
-    
-#     # Efficient Math: Total pixels - white pixels = black pixels.
-#     # This avoids scanning the 4-million-pixel array a second time
-#     total_pixels = img.size
-#     black_count = total_pixels - white_count  # Faster than scanning the array a second time
-    
-#     # This avoids scanning the 4-million-pixel array a second time.
-#     # Calculate percentage of fibrosis (white pixels)
-#     white_percent = (white_count / total_pixels) * 100
-#     white_percent_list.append(white_percent)
-
-#     # Use os.path.basename for cleaner CSVs (removes the long C:\Users\... prefix)
-#     clean_name = os.path.basename(filename)
-
-#     # Store results in a dictionary for easy CSV writing with Pandas. This is more efficient than writing to CSV line by line.
-#     # This results later has the percent white pixels pulled to then be used for other data manipulations later. 
-#     results.append({
-#         'Filename': clean_name,
-#         'Depth': depth,
-#         'White_Pixels': white_count,
-#         'Black_Pixels': black_count,
-#         'White_Percent': round(white_percent, 2)
-#     })
-
+# this part of the code is the most computationally intensive part. 
+#   Essentially, we want to time it to see how long it takes with and without vectorization. The for loop iterates through each image, counts the white and black pixels, calculates the percentage of white pixels, and stores the results in a list of dictionaries. 
+# The use of NumPy's vectorized operations (like np.count_nonzero) makes this process much faster than iterating through each pixel manually.
 for img, filename, depth in zip(images_loaded, filenames, depths):
     # img is directly available — no .index() lookup needed
     white_count = np.count_nonzero(img > 127)
     total_pixels = img.size
     black_count = total_pixels - white_count
     white_percent = (white_count / total_pixels) * 100
-    white_percent_list.append(white_percent)
-    clean_name = os.path.basename(filename)
+    white_percent_list.append(white_percent) # adding the white percent to a list for later use in interpolation and plotting
+    clean_name = os.path.basename(filename) # os.path.basename() extracts just the filename from the full path, which is cleaner for the CSV output. This is more robust than manually splitting the string, as it works regardless of the operating system or path format.
     results.append({
         'Filename': clean_name,
         'Depth': depth,
@@ -114,11 +74,11 @@ for img, filename, depth in zip(images_loaded, filenames, depths):
         'White_Percent': round(white_percent, 2)
     })
 
-end_time = time.time()  # End timer for efficiency testing (before printing results) -- faster time
+end_time = time.time()  # End timer for efficiency testing (before printing results) -- faster time --- averaging 0.00 to 0.01 seconds with vectorization, compared to 1.5 to 2 seconds initially without vectorization (when counting pixels with nested for loops instead of np.count_nonzero). This shows that vectorization is much more efficient for this type of pixel counting task.
 total_time = end_time - start_time  # End timer for efficiency testing (after for loop)
 
 
-# REQUIRED PRINT FORMAT
+# REQUIRED PRINT FORMAT FOR EACH IMAGE (for loop above):
 print(colored(clean_name, "red"))
 print(f"White pixels: {white_count}")
 print(f"Black pixels: {black_count}")
@@ -137,14 +97,18 @@ print(colored(f"Total processing time: {total_time:.2f} seconds", "cyan"))  # Pr
 
 # (End of assigned efficiency section - code below line 93 ignored)
 
+
+
+
 ##############
-# LECTURE 2: UNCOMMENT BELOW
+# LECTURE 2: Interpolation (and possibly extrapolation)
 # Interpolate a point: given a depth, find the corresponding white pixel percentage
 
 import matplotlib.pyplot as plt
 from scipy.interpolate import interp1d
 
-
+# interpolation instruction for the user to input a depth value for interpolation. 
+#   The input function prompts the user to enter a depth in microns, which is then converted to a float for use in the interpolation process. 
 interpolate_depth = float(input(colored(
 "Enter the depth at which you want to interpolate a point (in microns): ", "yellow")))
 
@@ -152,7 +116,10 @@ x = depths
 y = white_percent_list
 
 # You can also use 'quadratic', 'cubic', etc.
-i = interp1d(x, y, kind='quadratic')
+# This is the interpolation function that will allow us to find the corresponding y value (percentage of white pixels) for any given x value (depth) within the range of our data. The 'kind' parameter specifies the type of interpolation, and in this case, we are using linear interpolation.
+    # Essentially, the linear algebra side of our assigment: we are solving for the coefficients of a linear equation that best fits our data points, and then using those coefficients to compute the corresponding y value for a specific x value (the depth we want to interpolate at). The interp1d function from SciPy simplifies this process by creating an interpolation function that we can call with any x value to get the corresponding y value based on our original data points.
+    # This interp1d function can also handle more complex cases such as quadratic or cubic interpolation, which can provide a better fit for data that is not well represented by a straight line. By changing the 'kind' parameter, we can easily switch between different types of interpolation to see which one best fits our data.
+i = interp1d(x, y, kind='cubic')
 interpolate_point = i(interpolate_depth)
 print(colored(
     f'The interpolated point is at the x-coordinate {interpolate_depth} and y-coordinate {interpolate_point}.', "green"))
@@ -164,26 +131,39 @@ white_percents_i.append(interpolate_point)
 
 
 # make two plots: one that doesn't contain the interpolated point, just the data calculated from your images, and one that also contains the interpolated point (shown in red)
+# Create a figure window containing 2 stacked plots (2 rows, 1 column).
+# 'fig' = the whole window. 'axs' = array of the two plot panels.
+# axs[0] is the top plot, axs[1] is the bottom plot.
 fig, axs = plt.subplots(2, 1)
 
-axs[0].scatter(depths, white_percent_list, marker='o', linestyle='-', color='blue')
+# PLOT #1 (top): raw measured data only 
+# Plot the 6 real data points. scatter() draws individual dots.
+# Note: linestyle='-' does nothing on scatter() — that's a plot() argument.
+axs[0].scatter(depths, white_percent_list, marker='o', color='blue')
 axs[0].set_title('Plot of depth of image vs percentage white pixels')
 axs[0].set_xlabel('depth of image (in microns)')
 axs[0].set_ylabel('white pixels as a percentage of total pixels')
-axs[0].grid(True)
+axs[0].grid(True)   # adds background gridlines for readability
 
-
-axs[1].scatter(depths_i, white_percents_i, marker='o',
-               linestyle='-', color='blue')
+# PLOT #2 (bottom): same data + the interpolated point 
+# depths_i and white_percents_i are copies of the original lists
+# with the interpolated point appended as the 7th entry.
+axs[1].scatter(depths_i, white_percents_i, marker='o', color='blue')
 axs[1].set_title(
     'Plot of depth of image vs percentage white pixels with interpolated point (in red)')
 axs[1].set_xlabel('depth of image (in microns)')
 axs[1].set_ylabel('white pixels as a percentage of total pixels')
 axs[1].grid(True)
-axs[1].scatter(depths_i[len(depths_i)-1], white_percents_i[len(white_percents_i)-1],
+
+# Re-plot just the LAST item in the list (the interpolated point) in red.
+# depths_i[-1] is a cleaner way to write depths_i[len(depths_i)-1] — same thing.
+# s=100 makes the dot larger so it stands out visually.
+axs[1].scatter(depths_i[-1], white_percents_i[-1],
                color='red', s=100, label='Highlighted point')
 
-
-# Adjust layout to prevent overlap
+# Automatically adjusts spacing between the two plots so
+# titles and axis labels don't overlap each other.
 plt.tight_layout()
+
+# Render and display the figure window on screen.
 plt.show()

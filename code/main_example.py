@@ -13,25 +13,25 @@ import time                     # used on 03/24/2026 for inclass activity: compu
 
 # Load the images you want to analyze
 
-#filenames = [                                                                                                               # Variation in depth for better results (micrometers)
-    #r"C:\Users\kidus\OneDrive\Desktop\Computational BME\Module 03\Module-3-Fibrosis\images\MASK_Sk658 Llobe ch010039.jpg",  # 15
-    #r"C:\Users\kidus\OneDrive\Desktop\Computational BME\Module 03\Module-3-Fibrosis\images\MASK_Sk658 Llobe ch010032.jpg",  # 500
-    #r"C:\Users\kidus\OneDrive\Desktop\Computational BME\Module 03\Module-3-Fibrosis\images\MASK_Sk658 Llobe ch010146.jpg",  # 2000
-    #r"C:\Users\kidus\OneDrive\Desktop\Computational BME\Module 03\Module-3-Fibrosis\images\MASK_SK658 Slobe ch010112.jpg",  # 5500 
-    #r"C:\Users\kidus\OneDrive\Desktop\Computational BME\Module 03\Module-3-Fibrosis\images\MASK_SK658 Slobe ch010119.jpg",  # 8000
-    #r"C:\Users\kidus\OneDrive\Desktop\Computational BME\Module 03\Module-3-Fibrosis\images\MASK_SK658 Slobe ch010092.jpg",  # 10000
-#]
-
-# For partner: use relative paths so it works for them. 
-# Use relative paths so it works for your partner too!
-filenames = [
-    r"images/MASK_SK658 Llobe ch010039.jpg",
-    r"images/MASK_SK658 Llobe ch010032.jpg",
-    r"images/MASK_SK658 Slobe ch010146.jpg",
-    r"images/MASK_SK658 Slobe ch010112.jpg",
-    r"images/MASK_SK658 Slobe ch010119.jpg",
-    r"images/MASK_SK658 Slobe ch010092.jpg"
+filenames = [                                                                                                               # Variation in depth for better results (micrometers)
+    r"C:\Users\kidus\OneDrive\Desktop\Computational BME\Module 03\Module-3-Fibrosis\images\MASK_Sk658 Llobe ch010039.jpg",  # 15
+    r"C:\Users\kidus\OneDrive\Desktop\Computational BME\Module 03\Module-3-Fibrosis\images\MASK_Sk658 Llobe ch010032.jpg",  # 500
+    r"C:\Users\kidus\OneDrive\Desktop\Computational BME\Module 03\Module-3-Fibrosis\images\MASK_Sk658 Llobe ch010146.jpg",  # 2000
+    r"C:\Users\kidus\OneDrive\Desktop\Computational BME\Module 03\Module-3-Fibrosis\images\MASK_SK658 Slobe ch010112.jpg",  # 5500 
+    r"C:\Users\kidus\OneDrive\Desktop\Computational BME\Module 03\Module-3-Fibrosis\images\MASK_SK658 Slobe ch010119.jpg",  # 8000
+    r"C:\Users\kidus\OneDrive\Desktop\Computational BME\Module 03\Module-3-Fibrosis\images\MASK_SK658 Slobe ch010092.jpg",  # 10000
 ]
+
+# # For partner: use relative paths so it works for them. 
+# # Use relative paths so it works for your partner too!
+# filenames = [
+#     r"images/MASK_SK658 Llobe ch010039.jpg",
+#     r"images/MASK_SK658 Llobe ch010032.jpg",
+#     r"images/MASK_SK658 Slobe ch010146.jpg",
+#     r"images/MASK_SK658 Slobe ch010112.jpg",
+#     r"images/MASK_SK658 Slobe ch010119.jpg",
+#     r"images/MASK_SK658 Slobe ch010092.jpg"
+# ]
 
 # Enter the depth of each image (in the same order that the images are listed above; you can find these in the .csv file provided to you which is tilted: "Filenames and Depths for Students")
 
@@ -146,13 +146,13 @@ from scipy.interpolate import interp1d
 
 
 interpolate_depth = float(input(colored(
-    "Enter the depth at which you want to interpolate a point (in microns): ", "yellow")))
+"Enter the depth at which you want to interpolate a point (in microns): ", "yellow")))
 
 x = depths
 y = white_percent_list
 
 # You can also use 'quadratic', 'cubic', etc.
-i = interp1d(x, y, kind='linear')
+i = interp1d(x, y, kind='quadratic')
 interpolate_point = i(interpolate_depth)
 print(colored(
     f'The interpolated point is at the x-coordinate {interpolate_depth} and y-coordinate {interpolate_point}.', "green"))

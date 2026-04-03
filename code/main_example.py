@@ -16,13 +16,20 @@ import time                     # used on 03/24/2026 for inclass activity: compu
 # Load the images you want to analyze -- specific file paths depend from computer or access method: 
 # the primary images that we ended up analyzing are sourced from the images foleder in the Module-3-Fibrosis folder, but you can also use the full file paths to load the images if you want.
     # The 78 image are provided by the instructor. 
-filenames = [                                                                                                               # Variation in depth for better results (micrometers)
-    r"C:\Users\kidus\OneDrive\Desktop\Computational BME\Module 03\Module-3-Fibrosis\images\MASK_Sk658 Llobe ch010039.jpg",  # 15
-    r"C:\Users\kidus\OneDrive\Desktop\Computational BME\Module 03\Module-3-Fibrosis\images\MASK_Sk658 Llobe ch010032.jpg",  # 500
-    r"C:\Users\kidus\OneDrive\Desktop\Computational BME\Module 03\Module-3-Fibrosis\images\MASK_Sk658 Llobe ch010146.jpg",  # 2000
-    r"C:\Users\kidus\OneDrive\Desktop\Computational BME\Module 03\Module-3-Fibrosis\images\MASK_SK658 Slobe ch010112.jpg",  # 5500 
-    r"C:\Users\kidus\OneDrive\Desktop\Computational BME\Module 03\Module-3-Fibrosis\images\MASK_SK658 Slobe ch010119.jpg",  # 8000
-    r"C:\Users\kidus\OneDrive\Desktop\Computational BME\Module 03\Module-3-Fibrosis\images\MASK_SK658 Slobe ch010092.jpg",  # 10000
+# Load the images you want to analyze -- specific file paths depend from computer or access method: 
+filenames = [ 
+    r"C:\Users\kidus\OneDrive\Desktop\Computational BME\Module 03\Module-3-Fibrosis\images\MASK_Sk658 Llobe ch010039.jpg",  # 15 (Initial)
+    r"C:\Users\kidus\OneDrive\Desktop\Computational BME\Module 03\Module-3-Fibrosis\images\MASK_Sk658 Llobe ch010030.jpg",  # 200 (NEWly added)
+    r"C:\Users\kidus\OneDrive\Desktop\Computational BME\Module 03\Module-3-Fibrosis\images\MASK_Sk658 Llobe ch010032.jpg",  # 500 (Initial)
+    r"C:\Users\kidus\OneDrive\Desktop\Computational BME\Module 03\Module-3-Fibrosis\images\MASK_SK658 Llobe ch010067.jpg",  # 1500 (NEWly added)
+    r"C:\Users\kidus\OneDrive\Desktop\Computational BME\Module 03\Module-3-Fibrosis\images\MASK_Sk658 Llobe ch010146.jpg",  # 2000 (Initial)
+    r"C:\Users\kidus\OneDrive\Desktop\Computational BME\Module 03\Module-3-Fibrosis\images\MASK_SK658 Slobe ch010147.jpg",  # 3000 (NEWly added)
+    r"C:\Users\kidus\OneDrive\Desktop\Computational BME\Module 03\Module-3-Fibrosis\images\MASK_SK658 Slobe ch010134.jpg",  # 4500 (NEWly added)
+    r"C:\Users\kidus\OneDrive\Desktop\Computational BME\Module 03\Module-3-Fibrosis\images\MASK_SK658 Slobe ch010112.jpg",  # 5500 (Initial)
+    r"C:\Users\kidus\OneDrive\Desktop\Computational BME\Module 03\Module-3-Fibrosis\images\MASK_SK658 Slobe ch010126.jpg",  # 6800 (NEWly added)
+    r"C:\Users\kidus\OneDrive\Desktop\Computational BME\Module 03\Module-3-Fibrosis\images\MASK_SK658 Slobe ch010119.jpg",  # 8000 (Initial)
+    r"C:\Users\kidus\OneDrive\Desktop\Computational BME\Module 03\Module-3-Fibrosis\images\MASK_SK658 Slobe ch010136.jpg",  # 9200 (NEWly added)
+    r"C:\Users\kidus\OneDrive\Desktop\Computational BME\Module 03\Module-3-Fibrosis\images\MASK_SK658 Slobe ch010092.jpg",  # 10000 (Initial)
 ]
 
 # # For partner: use relative paths so it works for them. 
@@ -40,7 +47,9 @@ filenames = [                                                                   
 # The depth values are in microns, and they represent the depth at which each image was taken. This information is crucial for analyzing the relationship between depth and the percentage of white pixels in the images, which can be important for understanding tissue characteristics in a biomedical context.
 # More specifically, these are the depth values chronologically listed immages above, from shallowest to deepest within the mice lungs; and the team did this collection method instead of choosing images at complete random becasue we wanted to have a range of depths represented in our data, which can help us see trends and patterns in the percentage of white pixels as depth increases. 
 # By including images from various depths, we can better understand how the tissue characteristics change with depth, which is important for our analysis of fibrosis in the lungs.
-depths = [15, 500, 2000, 5500, 8000, 10000]
+
+# Updated depths list (in microns) formatted to match the order of the images above -- 6 original images + 6 newly added images for better interpolation and extrapolation.
+depths = [15, 200, 500, 1500, 2000, 3000, 4500, 5500, 6800, 8000, 9200, 10000]
 results = []
 white_percent_list = []
 
@@ -98,10 +107,8 @@ print(colored(f"Total processing time: {total_time:.2f} seconds", "cyan"))  # Pr
 # (End of assigned efficiency section - code below line 93 ignored)
 
 
-
-
-##############
 # LECTURE 2: Interpolation (and possibly extrapolation)
+#  ---reformated the orignial code from both interpolation_example.py and the code that we made intally for interpolation (above in comments) in main_example.py to make it more efficient and cleaner, and to add the quadratic and cubic interpolation options for better comparison of the fitting models; Wanted to also compare the errors more easily. 
 # Interpolate a point: given a depth, find the corresponding white pixel percentage
 
 import matplotlib.pyplot as plt
@@ -119,22 +126,49 @@ y = white_percent_list
 # This is the interpolation function that will allow us to find the corresponding y value (percentage of white pixels) for any given x value (depth) within the range of our data. The 'kind' parameter specifies the type of interpolation, and in this case, we are using linear interpolation.
     # Essentially, the linear algebra side of our assigment: we are solving for the coefficients of a linear equation that best fits our data points, and then using those coefficients to compute the corresponding y value for a specific x value (the depth we want to interpolate at). The interp1d function from SciPy simplifies this process by creating an interpolation function that we can call with any x value to get the corresponding y value based on our original data points.
     # This interp1d function can also handle more complex cases such as quadratic or cubic interpolation, which can provide a better fit for data that is not well represented by a straight line. By changing the 'kind' parameter, we can easily switch between different types of interpolation to see which one best fits our data.
-i = interp1d(x, y, kind='cubic')
-interpolate_point = i(interpolate_depth)
-print(colored(
-    f'The interpolated point is at the x-coordinate {interpolate_depth} and y-coordinate {interpolate_point}.', "green"))
+
+# We calculate the values for all three fitting methods to compare the fibrosis level predictions
+i_linear = interp1d(x, y, kind='linear')
+i_quadratic = interp1d(x, y, kind='quadratic')
+i_cubic = interp1d(x, y, kind='cubic')
+
+# calculating the interpolated points for all three fitting methods to compare the fibrosis level predictions: linear, quadratic, and cubic interpolation. This allows us to see how the predicted percentage of white pixels (which is an indicator of fibrosis level) changes based on the type of interpolation used, and to compare the accuracy of each method against the actual data points we have.
+interpolate_point_lin = i_linear(interpolate_depth)
+interpolate_point_quad = i_quadratic(interpolate_depth)
+interpolate_point_cub = i_cubic(interpolate_depth)
+
+# Identify the nearest actual data point for comparison and calculate the percent error
+# Identify the nearest actual data point for comparison
+closest_depth = min(depths, key=lambda d: abs(d - interpolate_depth))
+closest_val = white_percent_list[depths.index(closest_depth)]
+
+# Calculate the percent error for each interpolation method relative to this real image
+error_lin = abs(interpolate_point_lin - closest_val) / closest_val * 100
+error_quad = abs(interpolate_point_quad - closest_val) / closest_val * 100
+error_cub = abs(interpolate_point_cub - closest_val) / closest_val * 100
+
+print(colored(f"\n--- VALIDATION AGAINST REAL DATA ---", "yellow"))
+print(f"User Input Depth: {interpolate_depth} microns")
+print(f"Nearest Real Image: {closest_depth} microns (Measured Fibrosis: {closest_val:.2f}%)")
+print("-" * 50)
+print(f"Linear Prediction:    {interpolate_point_lin:.2f}% (Error: {error_lin:.2f}%)")
+print(f"Quadratic Prediction: {interpolate_point_quad:.2f}% (Error: {error_quad:.2f}%)")
+print(f"Cubic Prediction:     {interpolate_point_cub:.2f}% (Error: {error_cub:.2f}%)")
+print("-" * 50)
+# generate smooth lines for Plot #2 to show the fitting models through the interpolated point
+x_smooth = np.linspace(min(depths), max(depths), 500)
 
 depths_i = depths[:]
 depths_i.append(interpolate_depth)
 white_percents_i = white_percent_list[:]
-white_percents_i.append(interpolate_point)
+white_percents_i.append(interpolate_point_lin) # default list append for legacy structure
 
 
 # make two plots: one that doesn't contain the interpolated point, just the data calculated from your images, and one that also contains the interpolated point (shown in red)
 # Create a figure window containing 2 stacked plots (2 rows, 1 column).
 # 'fig' = the whole window. 'axs' = array of the two plot panels.
 # axs[0] is the top plot, axs[1] is the bottom plot.
-fig, axs = plt.subplots(2, 1)
+fig, axs = plt.subplots(2, 1, figsize=(8, 10))
 
 # PLOT #1 (top): raw measured data only 
 # Plot the 6 real data points. scatter() draws individual dots.
@@ -148,7 +182,13 @@ axs[0].grid(True)   # adds background gridlines for readability
 # PLOT #2 (bottom): same data + the interpolated point 
 # depths_i and white_percents_i are copies of the original lists
 # with the interpolated point appended as the 7th entry.
-axs[1].scatter(depths_i, white_percents_i, marker='o', color='blue')
+axs[1].scatter(depths_i[:-1], white_percents_i[:-1], marker='o', color='blue') # plot original 6
+
+# We add the line connections specifically to the plot containing the interpolated point to visualize the fit
+axs[1].plot(x_smooth, i_linear(x_smooth), label='Linear', color='green', linestyle='--', alpha=0.7)
+axs[1].plot(x_smooth, i_quadratic(x_smooth), label='Quadratic', color='orange', linestyle=':', alpha=0.7)
+axs[1].plot(x_smooth, i_cubic(x_smooth), label='Cubic', color='purple', alpha=0.5)
+
 axs[1].set_title(
     'Plot of depth of image vs percentage white pixels with interpolated point (in red)')
 axs[1].set_xlabel('depth of image (in microns)')
@@ -158,12 +198,14 @@ axs[1].grid(True)
 # Re-plot just the LAST item in the list (the interpolated point) in red.
 # depths_i[-1] is a cleaner way to write depths_i[len(depths_i)-1] — same thing.
 # s=100 makes the dot larger so it stands out visually.
-axs[1].scatter(depths_i[-1], white_percents_i[-1],
-               color='red', s=100, label='Highlighted point')
+# We plot the cubic interpolation as our highlighted red point
+axs[1].scatter(interpolate_depth, interpolate_point_cub,
+               color='red', s=100, label='Highlighted point', zorder=5)
 
 # Automatically adjusts spacing between the two plots so
 # titles and axis labels don't overlap each other.
 plt.tight_layout()
+axs[1].legend()
 
 # Render and display the figure window on screen.
 plt.show()
